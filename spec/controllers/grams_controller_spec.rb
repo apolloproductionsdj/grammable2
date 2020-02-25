@@ -10,6 +10,13 @@ RSpec.describe GramsController, type: :controller do
 
   describe "grams#new action" do 
     it "should show the user the form to add grams to database" do 
+      user = User.create(
+        email:        'fakeuser@gmail.com',
+        password:     'secretPassword',
+        password_confirmation: 'secretPassword'
+      )
+      sign_in user 
+
       get :new
       expect(response).to have_http_status(:success) 
     end 
@@ -17,18 +24,31 @@ RSpec.describe GramsController, type: :controller do
 
   describe "grams#create action" do 
     it "should allow for a new gram to be created" do 
+      user = User.create(
+        email:        'fakeuser@gmail.com',
+        password:     'secretPassword',
+        password_confirmation: 'secretPassword'
+      )
+      sign_in user 
       post :create, params: { gram: { message: 'Hello!'} }
       expect(response).to redirect_to root_path
       
       gram = Gram.last
       expect(gram.message).to eq("Hello!")
+      expect(gram.user).to eq(user)
     end 
   end
 
-  it "should properly deal with validation errors" do 
+  it "should properly deal with validation errors" do
+  user = User.create(
+        email:        'fakeuser@gmail.com',
+        password:     'secretPassword',
+        password_confirmation: 'secretPassword'
+      )
+      sign_in user  
     post :create, params: { gram: { message: '' } } 
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(Gram.count).to eq 0
+    expect(gram.count).to eq Gram.count 
   end 
 
 end
