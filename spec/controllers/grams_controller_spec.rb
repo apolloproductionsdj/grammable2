@@ -2,6 +2,14 @@ require 'rails_helper'
 
 RSpec.describe GramsController, type: :controller do
   describe "grams#destroy action" do 
+    it "should not allow users to destroy a user unless they are user that created it" do 
+      gram = FactoryBot.create(:gram)
+      user = FactoryBot.create(:user)
+      sign_in user 
+      delete :destroy, params: { id: gram.id }
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it "shouldn't allow unauthenticatd users to destroy a gram" do 
       gram = FactoryBot.create(:gram)
       delete :destroy, params: { id: gram.id }
@@ -26,6 +34,14 @@ RSpec.describe GramsController, type: :controller do
   end
 
   describe "grams#update action" do 
+    it "should not all for users who didn't create the gram to update it" do 
+      gram = FactoryBot.create(:gram)
+      user = FactoryBot.create(:user)
+      sign_in user 
+      patch :update, params: { id: gram.id, gram: { message: "Random Info" } }
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it "should allow unauthenticatd users to update a gram" do 
       gram = FactoryBot.create(:gram)
       patch :update, params: { id: gram.id, gram: { message: "Hello" } } 
